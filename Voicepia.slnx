@@ -1,9 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/Voicepia.Api/Voicepia.Api.csproj" />
-    <Project Path="src/Voicepia.App/Voicepia.App.csproj" />
-    <Project Path="src/Voicepia.Core/Voicepia.Core.csproj" />
-    <Project Path="src/Voicepia.Infrastructure/Voicepia.Infrastructure.csproj" />
-    <Project Path="src/Voicepia.Shared/Voicepia.Shared.csproj" />
-  </Folder>
-</Solution>
