@@ -1,4 +1,4 @@
-@Voicepia.Api_HostAddress = http://localhost:5181
+@Voicepia.Api_HostAddress = http://localhost:5287
 
 GET {{Voicepia.Api_HostAddress}}/weatherforecast/
 Accept: application/json
