@@ -1,5 +1,5 @@
 using Npgsql;
-using Voicepia.Api.Models;
+using Voicepia.Api.Models.Users;
 
 namespace Voicepia.Api.Gateways;
 

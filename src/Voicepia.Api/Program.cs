@@ -1,10 +1,21 @@
+using Microsoft.AspNetCore.Identity;
 using Voicepia.Api.Gateways;
+using Voicepia.Api.Models.Users;
+using Voicepia.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Gateway (데이터 계층)
 builder.Services.AddScoped<UserGateway>();
+
+// Service (업무 계층)
+builder.Services.AddScoped<UserService>();
+builder.Services.AddSingleton<IPasswordHasher<UserModel>, PasswordHasher<UserModel>>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,4 +1,4 @@
-namespace Voicepia.Api.Models;
+namespace Voicepia.Api.Models.Users;
 
 public class UserModel
 {
