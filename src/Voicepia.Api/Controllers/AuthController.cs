@@ -42,7 +42,7 @@ public class AuthController : ControllerBase
             new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Name, user.PenName),
-            new("security_stamp", user.SecurityStamp),
+            new(AuthClaimTypes.SecurityStamp, user.SecurityStamp),
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -76,5 +76,16 @@ public class AuthController : ControllerBase
         // 로그인 쿠키 삭제
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return Ok(Result<bool>.Ok(true));
+    }
+
+    [Authorize]
+    [HttpPost("logout-all")]
+    public async Task<ActionResult<Result<bool>>> LogoutAll()
+    {
+        // stamp를 새로 갈아서 모든 기기의 로그인을 끊고, 지금 기기의 쿠키도 지운다
+        var userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var result = await _userService.LogoutAllDevicesAsync(userId);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Ok(result);
     }
 }

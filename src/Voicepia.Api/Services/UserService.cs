@@ -39,7 +39,7 @@ public class UserService
         {
             Email = email,
             PenName = penName,
-            SecurityStamp = Guid.NewGuid().ToString("N"),
+            SecurityStamp = NewSecurityStamp(),
         };
         user.PasswordHash = _hasher.HashPassword(user, input.Password);
 
@@ -85,4 +85,20 @@ public class UserService
         await _users.RecordLoginSuccessAsync(user.UserId);
         return Result<UserModel>.Ok(user);
     }
+
+    // 로그인 쿠키에 들어 있는 stamp가 DB의 현재 값과 같은지 확인
+    public async Task<bool> IsSecurityStampValidAsync(long userId, string securityStamp)
+    {
+        var current = await _users.ReadSecurityStampAsync(userId);
+        return current != null && current == securityStamp;
+    }
+
+    // stamp를 새로 갈면, 예전 stamp를 가진 모든 기기의 로그인 쿠키가 무효가 된다
+    public async Task<Result<bool>> LogoutAllDevicesAsync(long userId)
+    {
+        await _users.UpdateSecurityStampAsync(userId, NewSecurityStamp());
+        return Result<bool>.Ok(true);
+    }
+
+    private static string NewSecurityStamp() => Guid.NewGuid().ToString("N");
 }

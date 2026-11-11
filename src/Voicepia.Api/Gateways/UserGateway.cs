@@ -79,6 +79,34 @@ public class UserGateway : GatewayBase
         await cmd.ExecuteNonQueryAsync();
     }
 
+    public async Task<string?> ReadSecurityStampAsync(long userId)
+    {
+        const string sql = "SELECT security_stamp FROM users WHERE user_id = @user_id";
+
+        await using var conn = await OpenAsync();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("user_id", userId);
+
+        var result = await cmd.ExecuteScalarAsync();
+        return result as string;   // 회원이 없으면 null
+    }
+
+    public async Task UpdateSecurityStampAsync(long userId, string securityStamp)
+    {
+        const string sql = @"
+            UPDATE users SET
+                security_stamp = @security_stamp,
+                updated_at     = now()
+            WHERE user_id = @user_id";
+
+        await using var conn = await OpenAsync();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("user_id", userId);
+        cmd.Parameters.AddWithValue("security_stamp", securityStamp);
+
+        await cmd.ExecuteNonQueryAsync();
+    }
+
     public async Task RecordLoginSuccessAsync(long userId)
     {
         const string sql = @"

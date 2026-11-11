@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Voicepia.Api.Common;
 using Voicepia.Api.Gateways;
 using Voicepia.Api.Models.Users;
 using Voicepia.Api.Services;
@@ -23,18 +24,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromDays(14);              // 14일 동안 로그인 유지
         options.SlidingExpiration = true;                            // 쓰는 동안은 만료가 계속 연장됨
 
-        // API라서 로그인 페이지로 보내지 않고 상태 코드만 돌려준다
-        options.Events.OnRedirectToLogin = context =>
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            return Task.CompletedTask;
-        };
-        options.Events.OnRedirectToAccessDenied = context =>
-        {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            return Task.CompletedTask;
-        };
+        // security_stamp 검사, 401/403 처리는 이 클래스가 맡는다
+        options.EventsType = typeof(AuthCookieEvents);
     });
+builder.Services.AddScoped<AuthCookieEvents>();
 builder.Services.AddAuthorization();
 
 // Gateway (데이터 계층)
