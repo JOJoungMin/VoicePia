@@ -56,4 +56,43 @@ public class UserGateway : GatewayBase
             UpdatedAt        = reader.GetDateTime(10),
         };
     }
+
+    public async Task RecordLoginFailureAsync(long userId, int maxAttempts, int lockoutMinutes)
+    {
+        const string sql = @"
+            UPDATE users SET
+                failed_login_count = CASE WHEN failed_login_count + 1 >= @max_attempts
+                                          THEN 0
+                                          ELSE failed_login_count + 1 END,
+                lockout_end        = CASE WHEN failed_login_count + 1 >= @max_attempts
+                                          THEN now() + make_interval(mins => @lockout_minutes)
+                                          ELSE lockout_end END,
+                updated_at         = now()
+            WHERE user_id = @user_id";
+
+        await using var conn = await OpenAsync();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("user_id", userId);
+        cmd.Parameters.AddWithValue("max_attempts", maxAttempts);
+        cmd.Parameters.AddWithValue("lockout_minutes", lockoutMinutes);
+
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    public async Task RecordLoginSuccessAsync(long userId)
+    {
+        const string sql = @"
+            UPDATE users SET
+                failed_login_count = 0,
+                lockout_end        = NULL,
+                last_login_at      = now(),
+                updated_at         = now()
+            WHERE user_id = @user_id";
+
+        await using var conn = await OpenAsync();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("user_id", userId);
+
+        await cmd.ExecuteNonQueryAsync();
+    }
 }

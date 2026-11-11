@@ -8,6 +8,9 @@ namespace Voicepia.Api.Services;
 
 public class UserService
 {
+    private const int MaxFailedAttempts = 5;
+    private const int LockoutMinutes = 15;
+
     private readonly UserGateway _users;
     private readonly IPasswordHasher<UserModel> _hasher;
 
@@ -52,5 +55,34 @@ public class UserService
                 ? Result<long>.Fail("DuplicatePenName", "이미 사용 중인 필명입니다.")
                 : Result<long>.Fail("DuplicateEmail", "이미 가입된 이메일입니다.");
         }
+    }
+
+    public async Task<Result<UserModel>> LoginAsync(LoginRequestModel input)
+    {
+        const string invalidMessage = "이메일 또는 비밀번호가 올바르지 않습니다.";
+
+        // 1. 입력 정리
+        var email = input.Email.Trim().ToLowerInvariant();
+
+        // 2. 회원 찾기
+        var user = await _users.ReadByEmailAsync(email);
+        if (user == null)
+            return Result<UserModel>.Fail("InvalidCredentials", invalidMessage);
+
+        // 3. 잠금 확인
+        if (user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow)
+            return Result<UserModel>.Fail("LockedOut", "로그인 시도가 너무 많아 잠시 잠겼습니다. 잠시 후 다시 시도하세요.");
+
+        // 4. 비밀번호 확인
+        var verify = _hasher.VerifyHashedPassword(user, user.PasswordHash, input.Password);
+        if (verify == PasswordVerificationResult.Failed)
+        {
+            await _users.RecordLoginFailureAsync(user.UserId, MaxFailedAttempts, LockoutMinutes);
+            return Result<UserModel>.Fail("InvalidCredentials", invalidMessage);
+        }
+
+        // 5. 성공 기록
+        await _users.RecordLoginSuccessAsync(user.UserId);
+        return Result<UserModel>.Ok(user);
     }
 }
