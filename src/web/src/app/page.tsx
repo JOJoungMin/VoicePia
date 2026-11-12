@@ -43,9 +43,14 @@ export default function Home() {
             <strong>{user.penName}</strong> 작가님, 환영합니다.
           </p>
           <p className="text-sm text-gray-500">{user.email}</p>
-          <button onClick={handleLogout} className="rounded border border-gray-400 px-4 py-2">
-            로그아웃
-          </button>
+          <div className="flex gap-3">
+            <Link href="/write" className="rounded bg-blue-600 px-4 py-2 text-white">
+              집필 시작
+            </Link>
+            <button onClick={handleLogout} className="rounded border border-gray-400 px-4 py-2">
+              로그아웃
+            </button>
+          </div>
         </div>
       )}
     </main>

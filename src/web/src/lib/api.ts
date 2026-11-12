@@ -16,7 +16,7 @@ export type UserInfo = {
 // /api/... 를 호출하고, 응답을 항상 ApiResult 모양으로 돌려준다
 export async function apiFetch<T>(
   path: string,
-  options: { method?: "GET" | "POST"; body?: unknown } = {},
+  options: { method?: "GET" | "POST" | "PATCH" | "DELETE"; body?: unknown } = {},
 ): Promise<ApiResult<T>> {
   try {
     const response = await fetch(path, {

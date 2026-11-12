@@ -24,3 +24,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 작성 화면(/write) 색상: VS Code처럼 탐색기(side)와 글 상자(editor)를 나눈다 */
+.workspace {
+  --ws-editor: #ffffff;
+  --ws-side: #f3f4f2;
+  --ws-statusbar: #eceeea;
+  --ws-ink: #1d2320;
+  --ws-muted: #66706b;
+  --ws-line: #dcdfdb;
+  --ws-hover: #e4e7e3;
+  --ws-selected: #d6e6df;
+  --ws-accent: #1f6f5c;
+  --ws-font-write: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  .workspace {
+    --ws-editor: #1b1e1d;
+    --ws-side: #151817;
+    --ws-statusbar: #121514;
+    --ws-ink: #e3e7e5;
+    --ws-muted: #8d9792;
+    --ws-line: #2b302e;
+    --ws-hover: #232826;
+    --ws-selected: #24403a;
+    --ws-accent: #2f8a74;
+  }
+}

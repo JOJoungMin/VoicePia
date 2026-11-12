@@ -30,11 +30,17 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddScoped<AuthCookieEvents>();
 builder.Services.AddAuthorization();
 
+// Dapper: SELECT 결과의 snake_case 컬럼(folder_id)을 PascalCase 속성(FolderId)에 자동으로 맞춘다
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
 // Gateway (데이터 계층)
 builder.Services.AddScoped<UserGateway>();
+builder.Services.AddScoped<FolderGateway>();
+builder.Services.AddScoped<DocumentGateway>();
 
 // Service (업무 계층)
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<WorkspaceService>();
 builder.Services.AddSingleton<IPasswordHasher<UserModel>, PasswordHasher<UserModel>>();
 
 var app = builder.Build();
